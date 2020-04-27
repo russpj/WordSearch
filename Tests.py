@@ -21,7 +21,7 @@ def ShowSearchResult(solver, word):
 
 def Main():
 	print('Running tests')
-	testSolver = WordSearchSolver('studentdictionary.txt', letters)
+	testSolver = WordSearchSolver('studentdictionary.txt', letters,9)
 	print('First word is {word}.'.format(word=testSolver.dictionary[0]))
 	ShowSearchResult(testSolver, 'pet')
 	ShowSearchResult(testSolver, 'pre')

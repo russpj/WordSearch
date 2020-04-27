@@ -6,7 +6,7 @@ from enum import Enum
 from bisect import bisect_left
 
 class WordSearchSolver:
-	def __init__(self, dictionaryName='', letters=[], **kwargs):
+	def __init__(self, dictionaryName='', letters=[], minSize=3, **kwargs):
 		if dictionaryName:
 			self.InitDictionary(dictionaryName)
 		self.letters=letters
@@ -16,6 +16,7 @@ class WordSearchSolver:
 		else:
 			self.numCols = 0
 		self.path = []
+		self.minSize = minSize
 
 	def InitDictionary(self, name):
 		with open(name) as dictionaryFile:
@@ -71,7 +72,7 @@ class WordSearchSolver:
 			self.path.pop()
 			return
 		
-		if match == self.Match.ExactMatch:
+		if match == self.Match.ExactMatch and len(word) >= self.minSize:
 			yield word
 
 		for cell in self.Cells(cell):
