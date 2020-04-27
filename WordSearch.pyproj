@@ -4,13 +4,14 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>9d13bccf-4931-43e4-b024-cbbaa7b40d34</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>WordSearch.py</StartupFile>
+    <StartupFile>Tests.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>WordSearch</Name>
     <RootNamespace>WordSearch</RootNamespace>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>

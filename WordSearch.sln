@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{128E3108-A03D-40E2-B6F3-02D76DF39CA3}"
 	ProjectSection(SolutionItems) = preProject
 		studentdictionary.txt = studentdictionary.txt
+		Tests.py = Tests.py
 	EndProjectSection
 EndProject
 Global
