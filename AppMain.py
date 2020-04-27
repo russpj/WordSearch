@@ -59,16 +59,16 @@ class AppInfo:
 		self.speedInfo=speedInfo
 
 infoFromState = {
-	AppState.Ready: AppInfo(statusText='Ready with {algorithm}', 
+	AppState.Ready: AppInfo(statusText='Ready', 
 												 startInfo=ButtonInfo(text='Start', enabled=True),
 												 speedInfo=ButtonInfo(text='Change Speed', enabled=True)),
-	AppState.Running: AppInfo(statusText='Running {algorithm}', 
+	AppState.Running: AppInfo(statusText='Running', 
 												 startInfo=ButtonInfo(text='Pause', enabled=True),
 												 speedInfo=ButtonInfo(text='Change Speed', enabled=False)),
-	AppState.Paused: AppInfo(statusText='Paused {algorithm}', 
+	AppState.Paused: AppInfo(statusText='Paused', 
 												 startInfo=ButtonInfo(text='Resume', enabled=True),
 												 speedInfo=ButtonInfo(text='Change Speed', enabled=True)),
-	AppState.Finished: AppInfo(statusText='Done with {algorithm}', 
+	AppState.Finished: AppInfo(statusText='Done', 
 												 startInfo=ButtonInfo(text='Reset', enabled=True),
 												 speedInfo=ButtonInfo(text='Change Speed', enabled=False))
 	}
@@ -107,7 +107,7 @@ class HeaderLayout(BoxLayout):
 	def UpdateText(self, fps=0, statusText='Ready', speedText=''):
 		self.speedLabel.text='Speed: {speed}'.format(speed=speedText)
 		self.fpsLabel.text = '{fpsValue:.0f} fps'.format(fpsValue=fps)
-		self.statusLabel.text = statusText.format()
+		self.statusLabel.text = statusText
 
 	def update_rect(self, instance, value):
 		instance.rect.pos = instance.pos
@@ -216,8 +216,6 @@ class Rotator(App):
 	def StartButtonCallback(self, instance):
 		if self.state==AppState.Ready:
 			self.array = list(range(self.simulationLength))
-			algorithm = infoFromAlgorithm[self.algorithm].algorithm
-			self.generator=algorithm(self.array, self.rotationShift)
 			self.StartClock()
 		if self.state==AppState.Running:
 			self.clock.cancel()
