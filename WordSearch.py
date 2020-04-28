@@ -68,15 +68,14 @@ class WordSearchSolver:
 		self.path.append(cell)
 		word = self.WordFromPath()
 		match, matchWord = self.FindWord(word)
-		if match == self.Match.NoMatch:
-			self.path.pop()
-			return
-		
-		if match == self.Match.ExactMatch and len(word) >= self.minSize:
-			yield word
 
-		for cell in self.Cells(cell):
-			yield from self.FindWords(cell)
+		if match != self.Match.NoMatch:
+			if match == self.Match.ExactMatch and len(word) >= self.minSize:
+				yield word
+
+			for cell in self.Cells(cell):
+				yield from self.FindWords(cell)
+		
 		self.path.pop()
 		return
 
