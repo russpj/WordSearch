@@ -11,6 +11,14 @@ letters = [
 		['s','g','u','o']
 	]
 
+lettersTest = [
+		['s','c','e','s'],
+		['y','i','a','h'],
+		['c','m','n','e'],
+		['s','a','d','s']
+	]
+
+
 def PrintGrid(letters):
 	for row in letters:
 		print(row)
@@ -38,6 +46,16 @@ def Main():
 			print (word)
 			foundWords.append(word)
 	print('Found {number} words.'.format(number=len(foundWords)))
+
+	testSolver = WordSearchSolver('studentdictionary.txt', lettersTest, 3)
+	foundWords = []
+	for word in testSolver.FindAllWords():
+		if word not in foundWords:
+			foundWords.append(word)
+	foundWords.sort()
+	for word in foundWords:
+		print (word)
+	print ('Found {found} words, expected 265.'.format(found=len(foundWords)))
 
 if __name__ == '__main__':
 	Main()
