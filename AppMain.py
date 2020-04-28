@@ -76,11 +76,15 @@ infoFromState = {
 
 # BoardLayout encapsulates the playing board
 class BoardLayout(BoxLayout):
-	def __init__(self, numCells):
+	def __init__(self):
 		super().__init__()
-		self.numCells = numCells
 		self.PlaceStuff()
 		self.bind(pos=self.update_rect, size=self.update_rect)
+
+	def PlaceStuff(self):
+		with self.canvas.before:
+			Color(0.1, .3, 0.1, 1)  # green; colors range from 0-1 not 0-255
+			self.rect = Rectangle(size=self.size, pos=self.pos)
 
 	def update_rect(self, instance, value):
 		instance.rect.pos = instance.pos
@@ -157,9 +161,6 @@ class Rotator(App):
 		self.state = AppState.Ready
 		self.clock=None
 		self.generator=None
-		self.simulationLength = 500
-		self.rotationShift = 150
-		self.array = list(range(self.simulationLength))
 		self.speed = Speed.Slow
 
 		# header
@@ -167,7 +168,7 @@ class Rotator(App):
 		layout.add_widget(self.header)
 
 		# board
-		self.boardLayout = boardLayout = BoardLayout(len(self.array))
+		self.boardLayout = boardLayout = BoardLayout()
 		layout.add_widget(boardLayout)
 
 		# footer
@@ -215,15 +216,11 @@ class Rotator(App):
 
 	def StartButtonCallback(self, instance):
 		if self.state==AppState.Ready:
-			self.array = list(range(self.simulationLength))
 			self.StartClock()
 		if self.state==AppState.Running:
 			self.clock.cancel()
 		if self.state==AppState.Paused:
 			self.StartClock()
-		if self.state==AppState.Finished:
-			self.array = list(range(self.simulationLength))
-			self.boardLayout.UpdateColors(self.array)
 		self.state = nextState[self.state]
 		self.UpdateUX()
 
