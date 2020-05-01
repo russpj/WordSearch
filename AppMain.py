@@ -9,6 +9,15 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.scrollview import ScrollView
 from kivy.clock import Clock
+from WordSearch import WordSearchSolver
+
+
+testLetters = [
+		['s','c','e','s'],
+		['y','i','a','h'],
+		['c','m','n','e'],
+		['s','a','d','s']
+	]
 
 class AppState(Enum):
 	Ready = 1
@@ -79,6 +88,7 @@ infoFromState = {
 class BoardLayout(BoxLayout):
 	def __init__(self):
 		super().__init__()
+		self.words = []
 		self.PlaceStuff()
 		self.bind(pos=self.update_rect, size=self.update_rect)
 
@@ -123,6 +133,10 @@ class BoardLayout(BoxLayout):
 		print('view pos {pos}, size {size}'.format(pos=self.view.pos, size=self.view.size))
 		print('wordLabel pos {pos}, size {size}'.format(pos=self.wordLabel.pos, size=self.wordLabel.size))
 		print('wordLabel text pos {pos}, size {size}'.format(pos=self.wordLabel.text_pos, size=self.wordLabel.text_size))
+
+	def UpdateWord(self, word):
+		self.words.append(word)
+		self.UpdateWords(self.words)
 
 class HeaderLayout(BoxLayout):
 	def __init__(self, **kwargs):
@@ -194,6 +208,7 @@ class Rotator(App):
 		self.root = layout = BoxLayout(orientation = 'vertical')
 		self.state = AppState.Ready
 		self.clock=None
+		self.solver = WordSearchSolver('studentdictionary.txt', testLetters)
 		self.generator=None
 		self.speed = Speed.Slow
 		self.words = []
@@ -229,7 +244,7 @@ class Rotator(App):
 		try:
 			if self.generator is not None:
 				result = next(self.generator)
-			self.boardLayout.UpdateColors(self.array)
+			self.boardLayout.UpdateWord(result)
 			self.UpdateUX(fps=fpsValue)
 		except StopIteration:
 			self.state=AppState.Finished
@@ -251,10 +266,8 @@ class Rotator(App):
 																				1.0/infoFromSpeed[self.speed].fps)
 
 	def StartButtonCallback(self, instance):
-		self.words.append('Text'+str(self.count))
-		self.count+=1
-		self.boardLayout.UpdateWords(self.words)
 		if self.state==AppState.Ready:
+			self.generator = self.solver.FindAllWords()
 			self.StartClock()
 		if self.state==AppState.Running:
 			self.clock.cancel()
