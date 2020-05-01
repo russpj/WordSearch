@@ -7,6 +7,7 @@ from kivy.graphics import Color, Rectangle, Line
 from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
 from kivy.uix.button import Button
+from kivy.uix.scrollview import ScrollView
 from kivy.clock import Clock
 
 class AppState(Enum):
@@ -86,9 +87,42 @@ class BoardLayout(BoxLayout):
 			Color(0.1, .3, 0.1, 1)  # green; colors range from 0-1 not 0-255
 			self.rect = Rectangle(size=self.size, pos=self.pos)
 
+		with self.canvas:
+			self.view = BoxLayout(pos=self.pos, size=self.size)
+			self.wordLabel = Label(pos=self.pos, size_hint=[1, None])
+			self.wordLabel.size=self.wordLabel.texture_size
+			self.add_widget(self.view)
+			self.view.add_widget(self.wordLabel)
+
 	def update_rect(self, instance, value):
 		instance.rect.pos = instance.pos
 		instance.rect.size = instance.size
+		instance.view.pos = instance.pos
+		instance.view.size = instance.size
+		print('view pos {pos}, size {size}'.format(pos=instance.view.pos, size=instance.view.size))
+		instance.wordLabel.pos = instance.pos
+		instance.wordLabel.size = instance.view.size
+		instance.wordLabel.text_size = instance.view.size
+		instance.wordLabel.text_pos = instance.view.pos
+		print('wordLabel pos {pos}, size {size}'.format(pos=instance.wordLabel.pos, size=instance.wordLabel.size))
+		print('wordLabel text pos {pos}, size {size}'.format(pos=instance.wordLabel.text_pos, size=instance.wordLabel.text_size))
+
+	def UpdateWords(self, words):
+		text = ''
+		for word in words:
+			if text:
+				text += '\n'
+			text += word
+		self.wordLabel.pos = self.view.pos
+		self.wordLabel.text = text
+		self.wordLabel.texture_update()
+		self.wordLabel.size = self.wordLabel.texture_size
+		self.wordLabel.text_size = self.wordLabel.texture_size
+		self.wordLabel.text_pos = self.view.pos
+		print('Layout pos {pos}, size {size}'.format(pos=self.pos, size=self.size))
+		print('view pos {pos}, size {size}'.format(pos=self.view.pos, size=self.view.size))
+		print('wordLabel pos {pos}, size {size}'.format(pos=self.wordLabel.pos, size=self.wordLabel.size))
+		print('wordLabel text pos {pos}, size {size}'.format(pos=self.wordLabel.text_pos, size=self.wordLabel.text_size))
 
 class HeaderLayout(BoxLayout):
 	def __init__(self, **kwargs):
@@ -162,6 +196,8 @@ class Rotator(App):
 		self.clock=None
 		self.generator=None
 		self.speed = Speed.Slow
+		self.words = []
+		self.count = 1
 
 		# header
 		self.header = HeaderLayout(size_hint=(1, .1))
@@ -215,6 +251,9 @@ class Rotator(App):
 																				1.0/infoFromSpeed[self.speed].fps)
 
 	def StartButtonCallback(self, instance):
+		self.words.append('Text'+str(self.count))
+		self.count+=1
+		self.boardLayout.UpdateWords(self.words)
 		if self.state==AppState.Ready:
 			self.StartClock()
 		if self.state==AppState.Running:
