@@ -121,7 +121,8 @@ class BoardLayout(BoxLayout):
 		print('wordLabel pos {pos}, size {size}'.format(pos=instance.wordLabel.pos, size=instance.wordLabel.size))
 		# print('wordLabel text pos {pos}, size {size}'.format(pos=instance.wordLabel.text_pos, size=instance.wordLabel.text_size))
 
-	def UpdateWords(self, words):
+	def UpdateWords(self):
+		words = self.wordList
 		text = ''
 		for word in words:
 			if text:
@@ -137,12 +138,17 @@ class BoardLayout(BoxLayout):
 		print('view pos {pos}, size {size}'.format(pos=self.words.pos, size=self.words.size))
 		print('wordLabel pos {pos}, size {size}'.format(pos=self.wordLabel.pos, size=self.wordLabel.size))
 		# print('wordLabel text pos {pos}, size {size}'.format(pos=self.wordLabel.text_pos, size=self.wordLabel.text_size))
-		self.wordCount += 1
 		self.countLabel.text = '{count} words found.'.format(count=self.wordCount)
+
+	def ResetWords(self):
+		self.wordList = []
+		self.wordCount = 0
+		self.UpdateWords()
 
 	def UpdateWord(self, word):
 		self.wordList.append(word)
-		self.UpdateWords(self.wordList)
+		self.wordCount += 1
+		self.UpdateWords()
 
 class HeaderLayout(BoxLayout):
 	def __init__(self, **kwargs):
@@ -279,6 +285,8 @@ class Rotator(App):
 			self.clock.cancel()
 		if self.state==AppState.Paused:
 			self.StartClock()
+		if self.state==AppState.Finished:
+			self.boardLayout.ResetWords()
 		self.state = nextState[self.state]
 		self.UpdateUX()
 
