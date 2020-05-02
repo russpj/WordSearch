@@ -86,9 +86,10 @@ infoFromState = {
 
 # BoardLayout encapsulates the playing board
 class BoardLayout(BoxLayout):
-	def __init__(self):
-		super().__init__()
-		self.words = []
+	def __init__(self, **kwargs):
+		super().__init__(orientation='horizontal', padding=10, **kwargs)
+		self.wordList = []
+		self.wordCount = 0
 		self.PlaceStuff()
 		self.bind(pos=self.update_rect, size=self.update_rect)
 
@@ -98,24 +99,27 @@ class BoardLayout(BoxLayout):
 			self.rect = Rectangle(size=self.size, pos=self.pos)
 
 		with self.canvas:
-			self.view = BoxLayout(pos=self.pos, size=self.size)
-			self.wordLabel = Label(pos=self.pos, size_hint=[1, None])
-			self.wordLabel.size=self.wordLabel.texture_size
-			self.add_widget(self.view)
-			self.view.add_widget(self.wordLabel)
+			self.words = BoxLayout(size_hint=[.25,1])
+			self.wordLabel = Label(size_hint=[1, 1])
+			#  self.wordLabel.size=self.wordLabel.texture_size
+			self.add_widget(self.words)
+			self.words.add_widget(self.wordLabel)
+			
+			self.countLabel = Label(size_hint=[.75, 1])
+			self.add_widget(self.countLabel)
 
 	def update_rect(self, instance, value):
 		instance.rect.pos = instance.pos
 		instance.rect.size = instance.size
-		instance.view.pos = instance.pos
-		instance.view.size = instance.size
-		print('view pos {pos}, size {size}'.format(pos=instance.view.pos, size=instance.view.size))
-		instance.wordLabel.pos = instance.pos
-		instance.wordLabel.size = instance.view.size
-		instance.wordLabel.text_size = instance.view.size
-		instance.wordLabel.text_pos = instance.view.pos
+		# self.words.pos = instance.pos
+		# self.words.size = instance.size
+		print('view pos {pos}, size {size}'.format(pos=self.words.pos, size=self.words.size))
+		# instance.wordLabel.pos = instance.pos
+		# instance.wordLabel.size = self.words.size
+		instance.wordLabel.text_size = self.words.size
+		# instance.wordLabel.text_pos = self.words.pos
 		print('wordLabel pos {pos}, size {size}'.format(pos=instance.wordLabel.pos, size=instance.wordLabel.size))
-		print('wordLabel text pos {pos}, size {size}'.format(pos=instance.wordLabel.text_pos, size=instance.wordLabel.text_size))
+		# print('wordLabel text pos {pos}, size {size}'.format(pos=instance.wordLabel.text_pos, size=instance.wordLabel.text_size))
 
 	def UpdateWords(self, words):
 		text = ''
@@ -123,20 +127,22 @@ class BoardLayout(BoxLayout):
 			if text:
 				text += '\n'
 			text += word
-		self.wordLabel.pos = self.view.pos
+		# self.wordLabel.pos = self.words.pos
 		self.wordLabel.text = text
 		self.wordLabel.texture_update()
-		self.wordLabel.size = self.wordLabel.texture_size
-		self.wordLabel.text_size = self.wordLabel.texture_size
-		self.wordLabel.text_pos = self.view.pos
+		# self.wordLabel.size = self.wordLabel.texture_size
+		self.wordLabel.text_size = self.wordLabel.size
+		# self.wordLabel.text_pos = self.words.pos
 		print('Layout pos {pos}, size {size}'.format(pos=self.pos, size=self.size))
-		print('view pos {pos}, size {size}'.format(pos=self.view.pos, size=self.view.size))
+		print('view pos {pos}, size {size}'.format(pos=self.words.pos, size=self.words.size))
 		print('wordLabel pos {pos}, size {size}'.format(pos=self.wordLabel.pos, size=self.wordLabel.size))
-		print('wordLabel text pos {pos}, size {size}'.format(pos=self.wordLabel.text_pos, size=self.wordLabel.text_size))
+		# print('wordLabel text pos {pos}, size {size}'.format(pos=self.wordLabel.text_pos, size=self.wordLabel.text_size))
+		self.wordCount += 1
+		self.countLabel.text = '{count} words found.'.format(count=self.wordCount)
 
 	def UpdateWord(self, word):
-		self.words.append(word)
-		self.UpdateWords(self.words)
+		self.wordList.append(word)
+		self.UpdateWords(self.wordList)
 
 class HeaderLayout(BoxLayout):
 	def __init__(self, **kwargs):
