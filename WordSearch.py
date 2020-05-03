@@ -80,7 +80,8 @@ class WordSearchSolver:
 		match, matchWord = self.FindWord(word)
 
 		if match != Match.NoMatch:
-			if match == Match.ExactMatch and len(word) >= self.minSize:
+			if (match==Match.PrefixMatch or 
+			 (match == Match.ExactMatch and len(word) >= self.minSize)):
 				yield FoundWord(word=word, match=match, path=self.path)
 
 			for cell in self.Cells(cell):

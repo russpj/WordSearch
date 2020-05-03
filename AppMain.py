@@ -10,6 +10,7 @@ from kivy.uix.button import Button
 from kivy.uix.scrollview import ScrollView
 from kivy.clock import Clock
 from WordSearch import WordSearchSolver
+from WordSearch import Match
 
 
 testLetters = [
@@ -103,13 +104,18 @@ class WordGrid(GridLayout):
 			self.letterLabels.append(colLabels)
 		return
 
-	def ShowPath(self, path):
-		exactMatchColor = [1.0, 0.0, 0.0, 1.0]
+	def ShowPath(self, match, path):
+		exactMatchColor = [1.0, 1.0, 0.0, 1.0]
+		prefixMatchColor = [1.0, 0.0, 0.0, 1.0]
+		if match == Match.ExactMatch:
+			matchColor = exactMatchColor
+		else:
+			matchColor = prefixMatchColor
 		defaultColor = [1.0, 1.0, 1.0, 1.0]
 		for row in range(len(self.letterLabels)):
 			for col in range(len(self.letterLabels[row])):
 				if [row, col] in path:
-					textColor = exactMatchColor
+					textColor = matchColor
 				else:
 					textColor = defaultColor
 				self.letterLabels[row][col].color=textColor
@@ -161,16 +167,18 @@ class BoardLayout(BoxLayout):
 		print('view pos {pos}, size {size}'.format(pos=self.words.pos, size=self.words.size))
 		print('wordLabel pos {pos}, size {size}'.format(pos=self.wordLabel.pos, size=self.wordLabel.size))
 		self.countLabel.text = 'Words found:\n{count}'.format(count=self.wordCount)
-		self.wordGrid.ShowPath(self.path)
+		self.wordGrid.ShowPath(self.match, self.path)
 
 	def ResetWords(self):
 		self.wordList = []
 		self.wordCount = 0
 		self.UpdateWords()
 
-	def UpdateWord(self, word, path):
-		self.wordList.append(word)
-		self.wordCount += 1
+	def UpdateWord(self, word, match, path):
+		if match==Match.ExactMatch:
+			self.wordList.append(word)
+			self.wordCount += 1
+		self.match = match
 		self.path = path
 		self.UpdateWords()
 
@@ -280,7 +288,7 @@ class Rotator(App):
 		try:
 			if self.generator is not None:
 				result = next(self.generator)
-			self.boardLayout.UpdateWord(result.word, result.path)
+			self.boardLayout.UpdateWord(result.word, result.match, result.path)
 			self.UpdateUX(fps=fpsValue)
 		except StopIteration:
 			self.state=AppState.Finished
