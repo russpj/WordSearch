@@ -105,20 +105,23 @@ class WordGrid(GridLayout):
 		return
 
 	def ShowPath(self, match, path):
-		exactMatchColor = [1.0, 1.0, 0.0, 1.0]
-		prefixMatchColor = [1.0, 0.0, 0.0, 1.0]
+		exactMatchColor = [0.0, 1.0, 0.0, 1.0]
+		prefixMatchColor = [1.0, 1.0, 0.0, 1.0]
 		if match == Match.ExactMatch:
 			matchColor = exactMatchColor
 		else:
 			matchColor = prefixMatchColor
 		defaultColor = [1.0, 1.0, 1.0, 1.0]
+		# restore letters to default
 		for row in range(len(self.letterLabels)):
 			for col in range(len(self.letterLabels[row])):
-				if [row, col] in path:
-					textColor = matchColor
-				else:
-					textColor = defaultColor
-				self.letterLabels[row][col].color=textColor
+				self.letterLabels[row][col].color=defaultColor
+		# draw path
+		matchColor[3] = 0.1
+		alphaStep = 0.9/(len(path))
+		for cell in path:
+			matchColor[3] += alphaStep
+			self.letterLabels[cell[0]][cell[1]].color=matchColor.copy()
 
 class BoardLayout(BoxLayout):
 	def __init__(self, letters=[], **kwargs):
@@ -131,16 +134,16 @@ class BoardLayout(BoxLayout):
 
 	def PlaceStuff(self, letters):
 		with self.canvas.before:
-			Color(0.1, .3, 0.1, 1)  # green; colors range from 0-1 not 0-255
+			Color(0.2, .2, 0.2, 1)  # grey; colors range from 0-1 not 0-255
 			self.rect = Rectangle(size=self.size, pos=self.pos)
 
 		with self.canvas:
 			self.words = BoxLayout(size_hint=[.25,1])
-			self.wordLabel = Label(size_hint=[1, 1])
+			self.wordLabel = Label(size_hint=[1, 1], font_size=25)
 			self.add_widget(self.words)
 			self.words.add_widget(self.wordLabel)
 			
-			self.countLabel = Label(size_hint=[.25, 1])
+			self.countLabel = Label(size_hint=[.25, 1], font_size=30)
 			self.add_widget(self.countLabel)
 
 			self.wordGrid = WordGrid(letters=letters, size_hint=[.5, 1])
