@@ -87,24 +87,24 @@ infoFromState = {
 # BoardLayout encapsulates the playing board
 
 class WordGrid(BoxLayout):
-	def __init__(self, **kwargs):
+	def __init__(self, letters=[], **kwargs):
 		super().__init__(**kwargs)
-		self.PlaceStuff()
+		self.PlaceStuff(letters)
 		return
 
-	def PlaceStuff(self):
+	def PlaceStuff(self, letters):
 		return
 
 class BoardLayout(BoxLayout):
-	def __init__(self, **kwargs):
+	def __init__(self, letters=[], **kwargs):
 		super().__init__(orientation='horizontal', padding=10, **kwargs)
 		self.wordList = []
 		self.wordCount = 0
-		self.PlaceStuff()
+		self.PlaceStuff(letters)
 		self.bind(pos=self.update_rect, size=self.update_rect)
 		return
 
-	def PlaceStuff(self):
+	def PlaceStuff(self, letters):
 		with self.canvas.before:
 			Color(0.1, .3, 0.1, 1)  # green; colors range from 0-1 not 0-255
 			self.rect = Rectangle(size=self.size, pos=self.pos)
@@ -112,28 +112,21 @@ class BoardLayout(BoxLayout):
 		with self.canvas:
 			self.words = BoxLayout(size_hint=[.25,1])
 			self.wordLabel = Label(size_hint=[1, 1])
-			#  self.wordLabel.size=self.wordLabel.texture_size
 			self.add_widget(self.words)
 			self.words.add_widget(self.wordLabel)
 			
 			self.countLabel = Label(size_hint=[.25, 1])
 			self.add_widget(self.countLabel)
 
-			self.wordGrid = WordGrid(size_hint=[.5, 1])
+			self.wordGrid = WordGrid(letters=letters, size_hint=[.5, 1])
 			self.add_widget(self.wordGrid)
 
 	def update_rect(self, instance, value):
 		instance.rect.pos = instance.pos
 		instance.rect.size = instance.size
-		# self.words.pos = instance.pos
-		# self.words.size = instance.size
 		print('view pos {pos}, size {size}'.format(pos=self.words.pos, size=self.words.size))
-		# instance.wordLabel.pos = instance.pos
-		# instance.wordLabel.size = self.words.size
 		instance.wordLabel.text_size = self.words.size
-		# instance.wordLabel.text_pos = self.words.pos
 		print('wordLabel pos {pos}, size {size}'.format(pos=instance.wordLabel.pos, size=instance.wordLabel.size))
-		# print('wordLabel text pos {pos}, size {size}'.format(pos=instance.wordLabel.text_pos, size=instance.wordLabel.text_size))
 
 	def UpdateWords(self):
 		words = self.wordList
@@ -142,17 +135,13 @@ class BoardLayout(BoxLayout):
 			if text:
 				text += '\n'
 			text += word
-		# self.wordLabel.pos = self.words.pos
 		self.wordLabel.text = text
 		self.wordLabel.texture_update()
-		# self.wordLabel.size = self.wordLabel.texture_size
 		self.wordLabel.text_size = self.wordLabel.size
-		# self.wordLabel.text_pos = self.words.pos
 		print('Layout pos {pos}, size {size}'.format(pos=self.pos, size=self.size))
 		print('view pos {pos}, size {size}'.format(pos=self.words.pos, size=self.words.size))
 		print('wordLabel pos {pos}, size {size}'.format(pos=self.wordLabel.pos, size=self.wordLabel.size))
-		# print('wordLabel text pos {pos}, size {size}'.format(pos=self.wordLabel.text_pos, size=self.wordLabel.text_size))
-		self.countLabel.text = '{count} words found.'.format(count=self.wordCount)
+		self.countLabel.text = 'Words found:\n{count}'.format(count=self.wordCount)
 
 	def ResetWords(self):
 		self.wordList = []
