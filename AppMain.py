@@ -88,10 +88,10 @@ infoFromState = {
 # BoardLayout encapsulates the playing board
 
 class RoundedRectLabel(Label):
-	def __init__(self, **kwargs):
-		super().__init__(**kwargs)
+	def __init__(self, text_color=[0.0, 0.0, 0.0, 1.0], back_color=[1.0, 1.0, 1.0, 1.0], **kwargs):
+		super().__init__(color=text_color, **kwargs)
 		with self.canvas.before:
-			Color(1.0, 1.0, 1.0, 1.0)
+			self.back_color=Color(back_color[0], back_color[1],back_color[2], back_color[3])
 			self.background = RoundedRectangle(size=self.size, pos=self.pos)
 		
 		self.bind(pos=self.update_rect, size=self.update_rect)
@@ -101,6 +101,12 @@ class RoundedRectLabel(Label):
 		self.background.pos = instance.pos
 		self.background.size = instance.size
 		return
+
+	def SetColors(self, text_color=[0.0, 0.0, 0.0, 1.0],
+							 back_color=[1.0, 1.0, 1.0, 1.0]):
+		self.color = text_color
+		self.back_color = Color(back_color[0], back_color[1],back_color[2], back_color[3])
+
 
 
 class WordGrid(GridLayout):
@@ -114,7 +120,8 @@ class WordGrid(GridLayout):
 		for row in range(4):
 			colLabels=[]
 			for col in range(4):
-				label = RoundedRectLabel(text=letters[row][col], font_size=40, color=[0,0,0,1])
+				label = RoundedRectLabel(text=letters[row][col], font_size=40, 
+														 text_color=[0,0,0,1], back_color=[1,1,1,1])
 				self.add_widget(label)
 				colLabels.append(label)
 			self.letterLabels.append(colLabels)
@@ -131,14 +138,14 @@ class WordGrid(GridLayout):
 		# restore letters to default
 		for row in range(len(self.letterLabels)):
 			for col in range(len(self.letterLabels[row])):
-				self.letterLabels[row][col].color=defaultColor
+				self.letterLabels[row][col].SetColors(text_color=defaultColor, back_color=[1,1,1,1])
 		# draw path
 		matchColor[3] = 0.1
 		if path:
 			alphaStep = 0.9/(len(path))
 			for cell in path:
 				matchColor[3] += alphaStep
-				self.letterLabels[cell[0]][cell[1]].color=matchColor.copy()
+				self.letterLabels[cell[0]][cell[1]].SetColors(text_color=matchColor.copy(), back_color=[1,1,1,1])
 
 class BoardLayout(BoxLayout):
 	def __init__(self, letters=[], **kwargs):
