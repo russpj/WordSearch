@@ -178,7 +178,7 @@ class BoardLayout(BoxLayout):
 		self.UpdateWords()
 
 	def UpdateWord(self, word, match, path):
-		if match==Match.ExactMatch:
+		if match==Match.ExactMatch and word not in self.wordList:
 			self.wordList.append(word)
 			self.wordCount += 1
 		self.match = match
