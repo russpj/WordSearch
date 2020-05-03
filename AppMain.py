@@ -85,6 +85,16 @@ infoFromState = {
 
 
 # BoardLayout encapsulates the playing board
+
+class WordGrid(BoxLayout):
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		self.PlaceStuff()
+		return
+
+	def PlaceStuff(self):
+		return
+
 class BoardLayout(BoxLayout):
 	def __init__(self, **kwargs):
 		super().__init__(orientation='horizontal', padding=10, **kwargs)
@@ -92,6 +102,7 @@ class BoardLayout(BoxLayout):
 		self.wordCount = 0
 		self.PlaceStuff()
 		self.bind(pos=self.update_rect, size=self.update_rect)
+		return
 
 	def PlaceStuff(self):
 		with self.canvas.before:
@@ -105,8 +116,11 @@ class BoardLayout(BoxLayout):
 			self.add_widget(self.words)
 			self.words.add_widget(self.wordLabel)
 			
-			self.countLabel = Label(size_hint=[.75, 1])
+			self.countLabel = Label(size_hint=[.25, 1])
 			self.add_widget(self.countLabel)
+
+			self.wordGrid = WordGrid(size_hint=[.5, 1])
+			self.add_widget(self.wordGrid)
 
 	def update_rect(self, instance, value):
 		instance.rect.pos = instance.pos
