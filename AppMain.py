@@ -97,11 +97,22 @@ class WordGrid(GridLayout):
 		for row in range(4):
 			colLabels=[]
 			for col in range(4):
-				label = Label(text=letters[row][col])
+				label = Label(text=letters[row][col], font_size=40)
 				self.add_widget(label)
 				colLabels.append(label)
 			self.letterLabels.append(colLabels)
 		return
+
+	def ShowPath(self, path):
+		exactMatchColor = [1.0, 0.0, 0.0, 1.0]
+		defaultColor = [1.0, 1.0, 1.0, 1.0]
+		for row in range(len(self.letterLabels)):
+			for col in range(len(self.letterLabels[row])):
+				if [row, col] in path:
+					textColor = exactMatchColor
+				else:
+					textColor = defaultColor
+				self.letterLabels[row][col].color=textColor
 
 class BoardLayout(BoxLayout):
 	def __init__(self, letters=[], **kwargs):
@@ -150,15 +161,17 @@ class BoardLayout(BoxLayout):
 		print('view pos {pos}, size {size}'.format(pos=self.words.pos, size=self.words.size))
 		print('wordLabel pos {pos}, size {size}'.format(pos=self.wordLabel.pos, size=self.wordLabel.size))
 		self.countLabel.text = 'Words found:\n{count}'.format(count=self.wordCount)
+		self.wordGrid.ShowPath(self.path)
 
 	def ResetWords(self):
 		self.wordList = []
 		self.wordCount = 0
 		self.UpdateWords()
 
-	def UpdateWord(self, word):
+	def UpdateWord(self, word, path):
 		self.wordList.append(word)
 		self.wordCount += 1
+		self.path = path
 		self.UpdateWords()
 
 class HeaderLayout(BoxLayout):
@@ -267,7 +280,7 @@ class Rotator(App):
 		try:
 			if self.generator is not None:
 				result = next(self.generator)
-			self.boardLayout.UpdateWord(result.word)
+			self.boardLayout.UpdateWord(result.word, result.path)
 			self.UpdateUX(fps=fpsValue)
 		except StopIteration:
 			self.state=AppState.Finished
