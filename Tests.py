@@ -40,7 +40,8 @@ def RunTest(letters, expected=0, sort=False):
 	PrintGrid(letters)
 	solver = WordSearchSolver('studentdictionary.txt', letters)
 	foundWords = []
-	for word in solver.FindAllWords():
+	for foundWord in solver.FindAllWords():
+		word = foundWord.word
 		if word not in foundWords:
 			foundWords.append(word)
 			if not sort:

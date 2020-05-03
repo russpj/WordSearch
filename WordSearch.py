@@ -5,6 +5,21 @@
 from enum import Enum
 from bisect import bisect_left
 
+
+class Match(Enum):
+	ExactMatch = 1
+	PrefixMatch = 2
+	NoMatch = 9
+
+
+class FoundWord:
+	def __init__(self, word='', match=Match.NoMatch, path=[], **kwargs):
+		self.word = word
+		self.match = match
+		self.path = path
+		return
+
+
 class WordSearchSolver:
 	def __init__(self, dictionaryName='', letters=[], minSize=3, **kwargs):
 		if dictionaryName:
@@ -22,24 +37,19 @@ class WordSearchSolver:
 		with open(name) as dictionaryFile:
 			self.dictionary = dictionaryFile.read().splitlines()
 
-	class Match(Enum):
-		ExactMatch = 1
-		PrefixMatch = 2
-		NoMatch = 9
-
 	def FindWord(self, word):
 		index = bisect_left(self.dictionary, word)
 		if index == len(self.dictionary):
-			match = self.Match.NoMatch
+			match = Match.NoMatch
 			matchedWord = ''
 		else:
 			matchedWord = self.dictionary[index]
 			if word == matchedWord:
-				match = self.Match.ExactMatch
+				match = Match.ExactMatch
 			elif word == matchedWord[:len(word)]:
-				match = self.Match.PrefixMatch
+				match = Match.PrefixMatch
 			else:
-				match = self.Match.NoMatch
+				match = Match.NoMatch
 		return match, matchedWord
 
 	def WordFromPath(self):
@@ -69,9 +79,9 @@ class WordSearchSolver:
 		word = self.WordFromPath()
 		match, matchWord = self.FindWord(word)
 
-		if match != self.Match.NoMatch:
-			if match == self.Match.ExactMatch and len(word) >= self.minSize:
-				yield word
+		if match != Match.NoMatch:
+			if match == Match.ExactMatch and len(word) >= self.minSize:
+				yield FoundWord(word=word, match=match, path=self.path)
 
 			for cell in self.Cells(cell):
 				yield from self.FindWords(cell)

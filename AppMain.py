@@ -97,7 +97,7 @@ class WordGrid(GridLayout):
 		for row in range(4):
 			colLabels=[]
 			for col in range(4):
-				label = Label(text=letters[row][col], size_hint=[.25, .25])
+				label = Label(text=letters[row][col])
 				self.add_widget(label)
 				colLabels.append(label)
 			self.letterLabels.append(colLabels)
@@ -267,7 +267,7 @@ class Rotator(App):
 		try:
 			if self.generator is not None:
 				result = next(self.generator)
-			self.boardLayout.UpdateWord(result)
+			self.boardLayout.UpdateWord(result.word)
 			self.UpdateUX(fps=fpsValue)
 		except StopIteration:
 			self.state=AppState.Finished
