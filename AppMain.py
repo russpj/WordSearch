@@ -86,13 +86,21 @@ infoFromState = {
 
 # BoardLayout encapsulates the playing board
 
-class WordGrid(BoxLayout):
+class WordGrid(GridLayout):
 	def __init__(self, letters=[], **kwargs):
-		super().__init__(**kwargs)
+		super().__init__(cols=4, **kwargs)
 		self.PlaceStuff(letters)
 		return
 
 	def PlaceStuff(self, letters):
+		self.letterLabels=[]
+		for row in range(4):
+			colLabels=[]
+			for col in range(4):
+				label = Label(text=letters[row][col], size_hint=[.25, .25])
+				self.add_widget(label)
+				colLabels.append(label)
+			self.letterLabels.append(colLabels)
 		return
 
 class BoardLayout(BoxLayout):
@@ -234,7 +242,7 @@ class Rotator(App):
 		layout.add_widget(self.header)
 
 		# board
-		self.boardLayout = boardLayout = BoardLayout()
+		self.boardLayout = boardLayout = BoardLayout(testLetters)
 		layout.add_widget(boardLayout)
 
 		# footer
