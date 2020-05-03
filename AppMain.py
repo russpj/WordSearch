@@ -3,7 +3,7 @@ from kivy.app import App
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
-from kivy.graphics import Color, Rectangle, Line
+from kivy.graphics import Color, Rectangle, Line, RoundedRectangle
 from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
 from kivy.uix.button import Button
@@ -87,9 +87,25 @@ infoFromState = {
 
 # BoardLayout encapsulates the playing board
 
+class RoundedRectLabel(Label):
+	def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		with self.canvas.before:
+			Color(1.0, 1.0, 1.0, 1.0)
+			self.background = RoundedRectangle(size=self.size, pos=self.pos)
+		
+		self.bind(pos=self.update_rect, size=self.update_rect)
+		return
+
+	def update_rect(self, instance, value):
+		self.background.pos = instance.pos
+		self.background.size = instance.size
+		return
+
+
 class WordGrid(GridLayout):
 	def __init__(self, letters=[], **kwargs):
-		super().__init__(cols=4, **kwargs)
+		super().__init__(cols=4, spacing=[1,1], **kwargs)
 		self.PlaceStuff(letters)
 		return
 
@@ -98,30 +114,31 @@ class WordGrid(GridLayout):
 		for row in range(4):
 			colLabels=[]
 			for col in range(4):
-				label = Label(text=letters[row][col], font_size=40)
+				label = RoundedRectLabel(text=letters[row][col], font_size=40, color=[0,0,0,1])
 				self.add_widget(label)
 				colLabels.append(label)
 			self.letterLabels.append(colLabels)
 		return
 
 	def ShowPath(self, match, path):
-		exactMatchColor = [0.0, 1.0, 0.0, 1.0]
-		prefixMatchColor = [1.0, 1.0, 0.0, 1.0]
+		exactMatchColor = [0.0, 0.5, 0.0, 1.0]
+		prefixMatchColor = [0.5, 0.5, 0.0, 1.0]
 		if match == Match.ExactMatch:
 			matchColor = exactMatchColor
 		else:
 			matchColor = prefixMatchColor
-		defaultColor = [1.0, 1.0, 1.0, 1.0]
+		defaultColor = [0.0, 0.0, 0.0, 1.0]
 		# restore letters to default
 		for row in range(len(self.letterLabels)):
 			for col in range(len(self.letterLabels[row])):
 				self.letterLabels[row][col].color=defaultColor
 		# draw path
 		matchColor[3] = 0.1
-		alphaStep = 0.9/(len(path))
-		for cell in path:
-			matchColor[3] += alphaStep
-			self.letterLabels[cell[0]][cell[1]].color=matchColor.copy()
+		if path:
+			alphaStep = 0.9/(len(path))
+			for cell in path:
+				matchColor[3] += alphaStep
+				self.letterLabels[cell[0]][cell[1]].color=matchColor.copy()
 
 class BoardLayout(BoxLayout):
 	def __init__(self, letters=[], **kwargs):
