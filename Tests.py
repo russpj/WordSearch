@@ -3,6 +3,7 @@
 # A test driver for WordSearch, using only console output
 
 from copy import deepcopy
+from time import perf_counter
 from WordSearch import WordSearchSolver
 from WordSearch import Match
 
@@ -41,6 +42,7 @@ def RunTest(letters, expected=0, sort=False, useFastAlgorithm=True):
 	PrintGrid(letters)
 	solver = WordSearchSolver('studentdictionary.txt', letters, useFastAlgorithm=useFastAlgorithm)
 	foundWords = []
+	beginTime = perf_counter()
 	for foundWord in solver.FindAllWords():
 		word = foundWord.word
 		if not useFastAlgorithm:
@@ -52,12 +54,15 @@ def RunTest(letters, expected=0, sort=False, useFastAlgorithm=True):
 			if not sort and useFastAlgorithm:
 				print(word)
 
+	elapsedTime = perf_counter() - beginTime
 	if sort and useFastAlgorithm:
 		foundWords.sort()
 		for word in foundWords:
 			print(word)
 	
-	print ('Found {found} words, expected {expected}.'.format(found=len(foundWords), expected=expected))
+	print ('Found {found} words, expected {expected} in {time} seconds.'
+				.format(found=len(foundWords), expected=expected, 
+						time = elapsedTime))
 
 def RunFoxesTest():
 	for row in range(4):
