@@ -150,10 +150,10 @@ class WordGrid(GridLayout):
 		return
 
 	def ShowPath(self, match, path):
-		exactMatchColorMin = [0.0, 0.5, 0.0, 1.0]
-		exactMatchColorMax = [0.0, 1.0, 0.0, 1.0]
-		prefixMatchColorMin = [0.5, 0.5, 0.0, 1.0]
-		prefixMatchColorMax = [1.0, 1.0, 0.0, 1.0]
+		exactMatchColorMax = [0.0, 0.5, 0.0, 1.0]
+		exactMatchColorMin = [0.0, 1.0, 0.0, 1.0]
+		prefixMatchColorMax = [0.5, 0.5, 0.0, 1.0]
+		prefixMatchColorMin = [1.0, 1.0, 0.0, 1.0]
 		defaultColor = [0.0, 0.0, 0.0, 1.0]
 		# restore letters to default
 		for row in range(len(self.letterLabels)):
@@ -161,8 +161,8 @@ class WordGrid(GridLayout):
 				self.letterLabels[row][col].SetColors(text_color=defaultColor, back_color=[1,1,1,1])
 		# draw path
 		if path:
-			ratio = 1.0/len(path)
-			ratioStep = ratio
+			ratio = 0.0
+			ratioStep = 1.0/len(path)
 			if match == Match.ExactMatch:
 				matchColorMin = exactMatchColorMin
 				matchColorMax = exactMatchColorMax
