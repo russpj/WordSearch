@@ -4,6 +4,7 @@
 
 from copy import deepcopy
 from WordSearch import WordSearchSolver
+from WordSearch import Match
 
 letters = [
 		['a','d','r','e'],
@@ -42,7 +43,7 @@ def RunTest(letters, expected=0, sort=False):
 	foundWords = []
 	for foundWord in solver.FindAllWords():
 		word = foundWord.word
-		if word not in foundWords:
+		if foundWord.match==Match.ExactMatch and  word not in foundWords:
 			foundWords.append(word)
 			if not sort:
 				print(word)
