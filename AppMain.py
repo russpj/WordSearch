@@ -12,6 +12,14 @@ from kivy.clock import Clock
 from WordSearch import WordSearchSolver
 from WordSearch import Match
 
+def InterpolateValues(valueMin, valueMax, ratio):
+	return valueMin*(1-ratio) + valueMax*ratio
+
+def InterpolateColors(colorMin, colorMax, ratio):
+	color = []
+	for index in range(len(colorMin)):
+		color.append(InterpolateValues(colorMin[index], colorMax[index], ratio))
+	return color
 
 testLetters = [
 		['s','c','e','s'],
@@ -90,12 +98,18 @@ infoFromState = {
 class RoundedRectLabel(Label):
 	def __init__(self, text_color=[0.0, 0.0, 0.0, 1.0], back_color=[1.0, 1.0, 1.0, 1.0], **kwargs):
 		super().__init__(color=text_color, **kwargs)
-		with self.canvas.before:
-			self.back_color=Color(back_color[0], back_color[1],back_color[2], back_color[3])
-			self.background = RoundedRectangle(size=self.size, pos=self.pos)
-		
+		self.back_color = back_color
+		self.CreateBackground(back_color, force=True)
 		self.bind(pos=self.update_rect, size=self.update_rect)
 		return
+
+	def CreateBackground(self, color=[1,1,1,1], force=False):
+		if force or self.back_color != color:
+			self.back_color = color
+			self.canvas.before.clear()
+			with self.canvas.before:
+				Color(color[0], color[1], color[2], color[3])
+				self.background = RoundedRectangle(size=self.size, pos=self.pos)
 
 	def update_rect(self, instance, value):
 		self.background.pos = instance.pos
@@ -105,13 +119,12 @@ class RoundedRectLabel(Label):
 	def SetColors(self, text_color=[0.0, 0.0, 0.0, 1.0],
 							 back_color=[1.0, 1.0, 1.0, 1.0]):
 		self.color = text_color
-		self.back_color = Color(back_color[0], back_color[1],back_color[2], back_color[3])
-
+		self.CreateBackground(back_color)
 
 
 class WordGrid(GridLayout):
 	def __init__(self, letters=[], **kwargs):
-		super().__init__(cols=4, spacing=[1,1], **kwargs)
+		super().__init__(cols=4, spacing=[3,3], **kwargs)
 		self.PlaceStuff(letters)
 		return
 
@@ -128,24 +141,29 @@ class WordGrid(GridLayout):
 		return
 
 	def ShowPath(self, match, path):
-		exactMatchColor = [0.0, 0.5, 0.0, 1.0]
-		prefixMatchColor = [0.5, 0.5, 0.0, 1.0]
-		if match == Match.ExactMatch:
-			matchColor = exactMatchColor
-		else:
-			matchColor = prefixMatchColor
+		exactMatchColorMin = [0.0, 0.5, 0.0, 1.0]
+		exactMatchColorMax = [0.0, 1.0, 0.0, 1.0]
+		prefixMatchColorMin = [0.5, 0.5, 0.0, 1.0]
+		prefixMatchColorMax = [1.0, 1.0, 0.0, 1.0]
 		defaultColor = [0.0, 0.0, 0.0, 1.0]
 		# restore letters to default
 		for row in range(len(self.letterLabels)):
 			for col in range(len(self.letterLabels[row])):
 				self.letterLabels[row][col].SetColors(text_color=defaultColor, back_color=[1,1,1,1])
 		# draw path
-		matchColor[3] = 0.1
 		if path:
-			alphaStep = 0.9/(len(path))
+			ratio = 1.0/len(path)
+			ratioStep = ratio
+			if match == Match.ExactMatch:
+				matchColorMin = exactMatchColorMin
+				matchColorMax = exactMatchColorMax
+			else:
+				matchColorMin = prefixMatchColorMin
+				matchColorMax = prefixMatchColorMax
 			for cell in path:
-				matchColor[3] += alphaStep
-				self.letterLabels[cell[0]][cell[1]].SetColors(text_color=matchColor.copy(), back_color=[1,1,1,1])
+				matchColor = InterpolateColors(matchColorMin, matchColorMax, ratio)
+				self.letterLabels[cell[0]][cell[1]].SetColors(back_color=matchColor.copy(), text_color=[0,0,0,1])
+				ratio += ratioStep
 
 class BoardLayout(BoxLayout):
 	def __init__(self, letters=[], **kwargs):
