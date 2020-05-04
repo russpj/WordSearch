@@ -124,9 +124,17 @@ class RoundedRectLabel(Label):
 
 class WordGrid(GridLayout):
 	def __init__(self, letters=[], **kwargs):
-		super().__init__(cols=4, spacing=[3,3], **kwargs)
+		super().__init__(cols=4, spacing=[3,3],
+									padding=[0,0], **kwargs)
 		self.PlaceStuff(letters)
+		self.bind(pos=self.update_rect, size=self.update_rect)
 		return
+
+	def update_rect(self, instance, value):
+		if instance.size[0] < instance.size[1]:
+			instance.padding = [0, (instance.size[1]-instance.size[0])/2]
+		else:
+			instance.padding = [(instance.size[0]-instance.size[1])/2, 0]
 
 	def PlaceStuff(self, letters):
 		self.letterLabels=[]
