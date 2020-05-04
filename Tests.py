@@ -35,20 +35,24 @@ def PrintGrid(letters):
 def ShowSearchResult(solver, word):
 	print('Looking up {word}: {result}'.format(result=solver.FindWord(word), word=word))
 
-def RunTest(letters, expected=0, sort=False):
+def RunTest(letters, expected=0, sort=False, useFastAlgorithm=True):
 	print()
 	print('Running test for')
 	PrintGrid(letters)
-	solver = WordSearchSolver('studentdictionary.txt', letters)
+	solver = WordSearchSolver('studentdictionary.txt', letters, useFastAlgorithm=useFastAlgorithm)
 	foundWords = []
 	for foundWord in solver.FindAllWords():
 		word = foundWord.word
+		if not useFastAlgorithm:
+			# print ('{word} {match}'.format(word=word, match=foundWord.match))
+			if foundWord.match==Match.ExactMatch:
+				print(word)
 		if foundWord.match==Match.ExactMatch and  word not in foundWords:
 			foundWords.append(word)
-			if not sort:
+			if not sort and useFastAlgorithm:
 				print(word)
 
-	if sort:
+	if sort and useFastAlgorithm:
 		foundWords.sort()
 		for word in foundWords:
 			print(word)
@@ -76,6 +80,8 @@ def Main():
 	RunTest(letters)
 	RunTest(testLetters, 265, True)
 	RunFoxesTest()
+
+	RunTest(testLetters, useFastAlgorithm=False)
 
 
 if __name__ == '__main__':

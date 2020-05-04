@@ -21,7 +21,8 @@ class FoundWord:
 
 
 class WordSearchSolver:
-	def __init__(self, dictionaryName='', letters=[], minSize=3, **kwargs):
+	def __init__(self, dictionaryName='', letters=[], 
+							minSize=3, useFastAlgorithm=True, **kwargs):
 		if dictionaryName:
 			self.InitDictionary(dictionaryName)
 		self.letters=letters
@@ -32,6 +33,7 @@ class WordSearchSolver:
 			self.numCols = 0
 		self.path = []
 		self.minSize = minSize
+		self.useFastAlgorithm = useFastAlgorithm
 
 	def InitDictionary(self, name):
 		with open(name) as dictionaryFile:
@@ -63,7 +65,7 @@ class WordSearchSolver:
 		col = cell[1]
 		return (row >= 0 and row < self.numRows and col >=0 and col < self.numCols)
 
-	def Cells(self, cell):
+	def CellsAround(self, cell):
 		row = cell[0]
 		col = cell[1]
 		for drow in range(-1, 2):
@@ -79,12 +81,17 @@ class WordSearchSolver:
 		word = self.WordFromPath()
 		match, matchWord = self.FindWord(word)
 
-		if match != Match.NoMatch:
-			if (match==Match.PrefixMatch or 
-			 (match == Match.ExactMatch and len(word) >= self.minSize)):
-				yield FoundWord(word=word, match=match, path=self.path)
+		if self.useFastAlgorithm:
+			if match != Match.NoMatch:
+				if (match==Match.PrefixMatch or 
+				 (match == Match.ExactMatch and len(word) >= self.minSize)):
+					yield FoundWord(word=word, match=match, path=self.path)
 
-			for cell in self.Cells(cell):
+				for cell in self.CellsAround(cell):
+					yield from self.FindWords(cell)
+		else:
+			yield FoundWord(word=word, match=match, path=self.path)
+			for cell in self.CellsAround(cell):
 				yield from self.FindWords(cell)
 		
 		self.path.pop()
