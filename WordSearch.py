@@ -90,6 +90,8 @@ class WordSearchSolver:
 				for cell in self.CellsAround(cell):
 					yield from self.FindWords(cell)
 		else:
+			if len(word) < self.minSize and match==Match.ExactMatch:
+				match = Match.PrefixMatch
 			yield FoundWord(word=word, match=match, path=self.path)
 			for cell in self.CellsAround(cell):
 				yield from self.FindWords(cell)

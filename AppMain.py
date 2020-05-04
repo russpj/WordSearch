@@ -53,11 +53,13 @@ class Speed(Enum):
 	Slow=1
 	Medium=2
 	Fast=3
+	Ludicrous=4
 
 nextSpeed={
 	Speed.Slow: Speed.Medium,
 	Speed.Medium: Speed.Fast,
-	Speed.Fast: Speed.Slow
+	Speed.Fast: Speed.Ludicrous,
+	Speed.Ludicrous: Speed.Slow
 	}
 
 class SpeedInfo:
@@ -68,7 +70,8 @@ class SpeedInfo:
 infoFromSpeed = {
 	Speed.Slow: SpeedInfo(statusText='Slow', fps=1),
 	Speed.Medium: SpeedInfo(statusText='Medium', fps=10),
-	Speed.Fast: SpeedInfo(statusText='High', fps=100)
+	Speed.Fast: SpeedInfo(statusText='High', fps=100),
+	Speed.Ludicrous: SpeedInfo(statusText='Ludicrous', fps=100)
 	}
 
 class ButtonInfo:
@@ -348,7 +351,11 @@ class Rotator(App):
 
 		try:
 			if self.generator is not None:
-				result = next(self.generator)
+				while True:
+					result = next(self.generator)
+					if self.speed != Speed.Ludicrous or result.match == Match.ExactMatch:
+						break
+
 			self.boardLayout.UpdateWord(result.word, result.match, result.path)
 			self.UpdateUX(fps=fpsValue)
 		except StopIteration:
