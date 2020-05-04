@@ -114,6 +114,7 @@ class RoundedRectLabel(Label):
 	def update_rect(self, instance, value):
 		self.background.pos = instance.pos
 		self.background.size = instance.size
+		self.font_size = instance.size[1]/2
 		return
 
 	def SetColors(self, text_color=[0.0, 0.0, 0.0, 1.0],
@@ -202,9 +203,10 @@ class BoardLayout(BoxLayout):
 	def update_rect(self, instance, value):
 		instance.rect.pos = instance.pos
 		instance.rect.size = instance.size
-		print('view pos {pos}, size {size}'.format(pos=self.words.pos, size=self.words.size))
 		instance.wordLabel.text_size = self.words.size
-		print('wordLabel pos {pos}, size {size}'.format(pos=instance.wordLabel.pos, size=instance.wordLabel.size))
+		instance.wordLabel.font_size = self.size[1]/25
+		instance.countLabel.text_size = self.countLabel.size
+		instance.countLabel.font_size = self.size[1]/15
 
 	def UpdateWords(self):
 		words = self.wordList
@@ -216,10 +218,8 @@ class BoardLayout(BoxLayout):
 		self.wordLabel.text = text
 		self.wordLabel.texture_update()
 		self.wordLabel.text_size = self.wordLabel.size
-		print('Layout pos {pos}, size {size}'.format(pos=self.pos, size=self.size))
-		print('view pos {pos}, size {size}'.format(pos=self.words.pos, size=self.words.size))
-		print('wordLabel pos {pos}, size {size}'.format(pos=self.wordLabel.pos, size=self.wordLabel.size))
-		self.countLabel.text = 'Words found:\n{count}'.format(count=self.wordCount)
+		self.countLabel.text_size = self.countLabel.size
+		self.countLabel.text = 'Words found: {count}'.format(count=self.wordCount)
 		self.wordGrid.ShowPath(self.match, self.path)
 
 	def ResetWords(self):
