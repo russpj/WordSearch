@@ -30,9 +30,9 @@ testLetters = [
 
 computerLetters = [
 	['c', 'o', 'm', 'p'],
-	['e', 't', 'u', 'b'],
-	['r', 'd', 'a', 'l'],
-	['s', 'a', 't', 'e']
+	['s', 't', 'u', 'b'],
+	['e', 'r', 'a', 'l'],
+	['d', 'a', 't', 'e']
 	]
 
 class AppState(Enum):
