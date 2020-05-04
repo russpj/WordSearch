@@ -22,10 +22,17 @@ def InterpolateColors(colorMin, colorMax, ratio):
 	return color
 
 testLetters = [
-		['s','c','e','s'],
-		['y','i','a','h'],
-		['c','m','n','e'],
-		['s','a','d','s']
+		['s','c','e','n'],
+		['y','c','i','e'],
+		['a','m','n','s'],
+		['s','a','d','e']
+	]
+
+computerLetters = [
+	['c', 'o', 'm', 'p'],
+	['e', 't', 'u', 'b'],
+	['r', 'd', 'a', 'l'],
+	['s', 'a', 't', 'e']
 	]
 
 class AppState(Enum):
@@ -305,7 +312,8 @@ class Rotator(App):
 		self.root = layout = BoxLayout(orientation = 'vertical')
 		self.state = AppState.Ready
 		self.clock=None
-		self.solver = WordSearchSolver('studentdictionary.txt', testLetters)
+		self.letters = computerLetters
+		self.solver = WordSearchSolver('studentdictionary.txt', self.letters, useFastAlgorithm=False)
 		self.generator=None
 		self.speed = Speed.Slow
 		self.words = []
@@ -316,7 +324,7 @@ class Rotator(App):
 		layout.add_widget(self.header)
 
 		# board
-		self.boardLayout = boardLayout = BoardLayout(testLetters)
+		self.boardLayout = boardLayout = BoardLayout(self.letters)
 		layout.add_widget(boardLayout)
 
 		# footer
