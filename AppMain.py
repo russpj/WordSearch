@@ -74,6 +74,26 @@ infoFromSpeed = {
 	Speed.Ludicrous: SpeedInfo(statusText='Ludicrous', fps=100)
 	}
 
+
+class Algorithm(Enum):
+	Thorough = 1
+	Pruned=2
+
+nextAlgorithm={
+	Algorithm.Thorough: Algorithm.Pruned,
+	Algorithm.Pruned: Algorithm.Thorough
+	}
+
+class AlgorithmInfo:
+	def __init__(self, statusText=''):
+		self.statusText = statusText
+
+infoFromAlgorithm = {
+	Algorithm.Thorough: AlgorithmInfo('Thorough Search'),
+	Algorithm.Pruned: AlgorithmInfo('Pruned Search')
+	}
+
+
 class ButtonInfo:
 	def __init__(self, enabled=True, text=''):
 		self.enabled = enabled
@@ -82,23 +102,29 @@ class ButtonInfo:
 class AppInfo:
 	def __init__(self, statusText='', 
 							startInfo=ButtonInfo(),
+							algorithmInfo=ButtonInfo(),
 							speedInfo=ButtonInfo()):
 		self.statusText=statusText
 		self.startInfo=startInfo
+		self.algorithmInfo=algorithmInfo
 		self.speedInfo=speedInfo
 
 infoFromState = {
-	AppState.Ready: AppInfo(statusText='Ready', 
+	AppState.Ready: AppInfo(statusText='{algorithm}', 
 												 startInfo=ButtonInfo(text='Start', enabled=True),
+												 algorithmInfo=ButtonInfo(text='Change Algorithm', enabled=True),
 												 speedInfo=ButtonInfo(text='Change Speed', enabled=True)),
-	AppState.Running: AppInfo(statusText='Running', 
+	AppState.Running: AppInfo(statusText='{algorithm} Running', 
 												 startInfo=ButtonInfo(text='Pause', enabled=True),
+												 algorithmInfo=ButtonInfo(text='Change Algorithm', enabled=False),
 												 speedInfo=ButtonInfo(text='Change Speed', enabled=False)),
-	AppState.Paused: AppInfo(statusText='Paused', 
+	AppState.Paused: AppInfo(statusText='{algorithm} Paused', 
 												 startInfo=ButtonInfo(text='Resume', enabled=True),
+												 algorithmInfo=ButtonInfo(text='Change Algorithm', enabled=False),
 												 speedInfo=ButtonInfo(text='Change Speed', enabled=True)),
-	AppState.Finished: AppInfo(statusText='Done', 
+	AppState.Finished: AppInfo(statusText='{algorithm} Done', 
 												 startInfo=ButtonInfo(text='Reset', enabled=True),
+												 algorithmInfo=ButtonInfo(text='Change Algorithm', enabled=False),
 												 speedInfo=ButtonInfo(text='Change Speed', enabled=False))
 	}
 
@@ -263,10 +289,10 @@ class HeaderLayout(BoxLayout):
 		self.fpsLabel = Label(text='0 fps', color=textColor)
 		self.add_widget(self.fpsLabel)
 		
-	def UpdateText(self, fps=0, statusText='Ready', speedText=''):
-		self.speedLabel.text='Speed: {speed}'.format(speed=speedText)
+	def UpdateText(self, fps=0, statusText='Ready', algorithmText='', speedText=''):
+		self.speedLabel.text = 'Speed: {speed}'.format(speed=speedText)
 		self.fpsLabel.text = '{fpsValue:.0f} fps'.format(fpsValue=fps)
-		self.statusLabel.text = statusText
+		self.statusLabel.text = statusText.format(algorithm=algorithmText)
 
 	def update_rect(self, instance, value):
 		instance.rect.pos = instance.pos
@@ -276,10 +302,12 @@ class HeaderLayout(BoxLayout):
 class FooterLayout(BoxLayout):
 	def __init__(self, 
 							start_button_callback=None, 
+							algorithm_button_callback=None,
 							speed_button_callback=None, 
 							**kwargs):
 		super().__init__(orientation='horizontal', padding=10, **kwargs)
 		self.start_button_callback=start_button_callback
+		self.algorithm_button_callback=algorithm_button_callback
 		self.speed_button_callback=speed_button_callback
 		self.PlaceStuff()
 		self.bind(pos=self.update_rect, size=self.update_rect)
@@ -292,6 +320,9 @@ class FooterLayout(BoxLayout):
 		self.speedButton = Button()
 		self.add_widget(self.speedButton)
 		self.speedButton.bind(on_press=self.speed_button_callback)
+		self.algorithmButton = Button()
+		self.add_widget(self.algorithmButton)
+		self.algorithmButton.bind(on_press=self.algorithm_button_callback)
 		self.startButton = Button()
 		self.add_widget(self.startButton)
 		self.startButton.bind(on_press=self.start_button_callback)
@@ -305,18 +336,25 @@ class FooterLayout(BoxLayout):
 		startInfo = appInfo.startInfo
 		self.startButton.text = startInfo.text
 		self.startButton.disabled = not startInfo.enabled
+		algorithmInfo = appInfo.algorithmInfo
+		self.algorithmButton.text = algorithmInfo.text
+		self.algorithmButton.disabled = not algorithmInfo.enabled
 		speedInfo = appInfo.speedInfo
 		self.speedButton.text=speedInfo.text
 		self.speedButton.disabled = not speedInfo.enabled
 
 
-class Rotator(App):
+class WordSearchApp(App):
 	def build(self):
 		self.root = layout = BoxLayout(orientation = 'vertical')
 		self.state = AppState.Ready
 		self.clock=None
 		self.letters = computerLetters
-		self.solver = WordSearchSolver('studentdictionary.txt', self.letters, useFastAlgorithm=False)
+		self.algorithm=Algorithm.Thorough
+		self.solver = WordSearchSolver(
+			'studentdictionary.txt', 
+			self.letters, 
+			useFastAlgorithm=self.algorithm==Algorithm.Pruned)
 		self.generator=None
 		self.speed = Speed.Slow
 		self.words = []
@@ -333,6 +371,7 @@ class Rotator(App):
 		# footer
 		self.footer = FooterLayout(size_hint=(1, .2), 
 														 start_button_callback=self.StartButtonCallback,
+														 algorithm_button_callback=self.AlgorithmButtonCallback,
 														 speed_button_callback=self.SpeedButtonCallback)
 		layout.add_widget(self.footer)
 
@@ -370,6 +409,7 @@ class Rotator(App):
 		appInfo = infoFromState[self.state]
 		self.header.UpdateText(fps = fps, 
 												 statusText=appInfo.statusText, 
+												 algorithmText=infoFromAlgorithm[self.algorithm].statusText,
 												 speedText=infoFromSpeed[speed].statusText)
 		self.footer.UpdateButtons(appInfo=appInfo)
 
@@ -390,13 +430,21 @@ class Rotator(App):
 		self.state = nextState[self.state]
 		self.UpdateUX()
 
+	def AlgorithmButtonCallback(self, instance):
+		self.algorithm=nextAlgorithm[self.algorithm]
+		self.solver = WordSearchSolver(
+			'studentdictionary.txt', 
+			self.letters,
+			useFastAlgorithm=self.algorithm==Algorithm.Pruned)
+		self.UpdateUX()
+
 	def SpeedButtonCallback(self, instance):
 		self.speed = nextSpeed[self.speed]
 		self.UpdateUX()
 
 
 def Main():
-	Rotator().run()
+	WordSearchApp().run()
 
 if __name__ == '__main__':
 	Main()
