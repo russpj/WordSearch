@@ -28,6 +28,13 @@ foxLetters = [
 		['x','o','x','o']
 	]
 
+computerLetters = [
+	['c', 'o', 'm', 'p'],
+	['s', 't', 'u', 'b'],
+	['e', 'r', 'a', 'l'],
+	['d', 'a', 't', 'e']
+	]
+
 
 def PrintGrid(letters):
 	for row in letters:
@@ -36,7 +43,7 @@ def PrintGrid(letters):
 def ShowSearchResult(solver, word):
 	print('Looking up {word}: {result}'.format(result=solver.FindWord(word), word=word))
 
-def RunTest(letters, expected=0, sort=False, useFastAlgorithm=True):
+def RunTest(letters, expected=0, sort=False, useFastAlgorithm=True, showWords=True):
 	print()
 	print('Running test for')
 	PrintGrid(letters)
@@ -47,15 +54,15 @@ def RunTest(letters, expected=0, sort=False, useFastAlgorithm=True):
 		word = foundWord.word
 		if not useFastAlgorithm:
 			# print ('{word} {match}'.format(word=word, match=foundWord.match))
-			if foundWord.match==Match.ExactMatch:
+			if foundWord.match==Match.ExactMatch and showWords:
 				print(word)
 		if foundWord.match==Match.ExactMatch and  word not in foundWords:
 			foundWords.append(word)
-			if not sort and useFastAlgorithm:
+			if not sort and useFastAlgorithm and showWords:
 				print(word)
 
 	elapsedTime = perf_counter() - beginTime
-	if sort and useFastAlgorithm:
+	if sort and useFastAlgorithm and showWords:
 		foundWords.sort()
 		for word in foundWords:
 			print(word)
@@ -86,7 +93,8 @@ def Main():
 	RunTest(testLetters, 265, True)
 	RunFoxesTest()
 
-	RunTest(testLetters, useFastAlgorithm=False)
+	RunTest(computerLetters, 422, showWords=False)
+	RunTest(computerLetters, 422, useFastAlgorithm=False, showWords=False)
 
 
 if __name__ == '__main__':
